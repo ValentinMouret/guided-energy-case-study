@@ -20,8 +20,8 @@ I will send you my keys, along with the case study, please don't abuse them :)
 
 You can check-out the repository:
 ```shell
-git clone git@github.com:ValentinMouret/guided-energy
-cd guided-energy
+git clone git@github.com:ValentinMouret/guided-energy-case-study
+cd guided-energy-case-study
 ```
 
 Then, here are several ways you can get the project running:
@@ -35,7 +35,7 @@ If you have Nix with flakes enabled:
 nix develop
 
 # Run the weather assistant
-uv run python -m back.workflow
+uv run python -m back.cli
 ```
 
 ### Option 2: Using Vanilla Python
@@ -50,7 +50,7 @@ uv sync
 source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 
 # Run the weather assistant
-uv run python -m back.workflow
+uv run python -m back.cli
 ```
 
 ### Option 3: Using Docker
@@ -67,13 +67,13 @@ Once set up, you can interact with the weather assistant:
 
 ```bash
 # Basic usage
-uv run python -m back.workflow
+uv run python -m back.cli
 
 # With debug mode to see tool calls
-uv run python -m back.workflow --debug
+uv run python -m back.cli --debug
 
 # Override API keys via command line
-uv run python -m back.workflow --api-key "your-key" --weather-api-key "your-weather-key"
+uv run python -m back.cli --api-key "your-key" --weather-api-key "your-weather-key"
 ```
 
 ## Technical decisions

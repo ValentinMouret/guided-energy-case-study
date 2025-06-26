@@ -49,12 +49,11 @@ client = anthropic.Anthropic(
 )
 
 
-async def main_loop(context: Context, debug: bool = False):
+async def main_loop(context: Context):
     """
     The agent handles the conversation loop.
     """
-    if debug:
-        logger.info(f"Messages: {context.messages}")
+    logger.info(f"Messages: {context.messages}")
 
     response = client.messages.create(
         model=config.model,
@@ -65,11 +64,10 @@ async def main_loop(context: Context, debug: bool = False):
         system=context.system_prompt,
         messages=context.messages,
     )
-    if debug:
-        logger.info(f"Got response: {response}")
+
+    logger.info(f"Got response: {response}")
 
     assistant_content = ""
-    tool_calls = []
 
     for content in response.content:
         match content:
@@ -77,17 +75,14 @@ async def main_loop(context: Context, debug: bool = False):
                 assistant_content += text
 
             case ToolUseBlock(id=id, name=name, input=input) as tool_use:
-                tool_calls.append(tool_use)
                 match name:
                     case "get_weather":
                         inputs = GetWeatherInputs.from_tool_call(input)
-                        if debug:
-                            logger.info(f"Tool use: get_weather({inputs.location})")
+                        logger.info(f"Tool use: get_weather({inputs.location})")
 
                         result = get_weather(inputs.location)
 
-                        if debug:
-                            logger.info(f"Weather result: {result}")
+                        logger.info(f"Weather result: {result}")
 
                         context.messages.extend(
                             [
@@ -99,7 +94,7 @@ async def main_loop(context: Context, debug: bool = False):
                             ]
                         )
 
-                        return await main_loop(context, debug=debug)
+                        return await main_loop(context)
 
                     case tool:
                         raise ValueError(f"Tool call error: unknown tool {tool}")
@@ -140,11 +135,3 @@ def tool_result_message(tool_use_id: str, content: str) -> MessageParam:
             }
         ],
     }
-
-
-if __name__ == "__main__":
-    from back.cli import chat
-
-    context = Context.default()
-
-    chat(context)

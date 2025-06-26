@@ -6,8 +6,8 @@ import click
 from anthropic import APIStatusError
 
 from back.config import config
-from back.workflow import Context, main_loop
 from back.prompts import SYSTEM_PROMPT
+from back.workflow import Context, main_loop
 
 
 def print_welcome():
@@ -38,15 +38,9 @@ def clear_thinking():
     envvar="WEATHER_API_KEY",
     help="Weather API key (can also be set via WEATHER_API_KEY env var)",
 )
-@click.option(
-    "--debug",
-    is_flag=True,
-    help="Enable debug mode to show tool calls",
-)
 def chat(
     api_key: str | None,
     weather_api_key: str | None,
-    debug: bool,
 ):
     """Start an interactive chat session with your weather assistant."""
 
@@ -99,7 +93,7 @@ def chat(
             print_thinking()
 
             try:
-                response = asyncio.run(main_loop(context, debug=debug))
+                response = asyncio.run(main_loop(context))
                 clear_thinking()
 
                 click.echo(
@@ -142,15 +136,7 @@ def chat(
                     click.echo(click.style(f"❌ API error: {e.message}", fg="red"))
             except Exception as e:
                 clear_thinking()
-                if debug:
-                    click.echo(click.style(f"❌ Error: {str(e)}", fg="red"))
-                else:
-                    click.echo(
-                        click.style(
-                            "❌ An error occurred. Use --debug for more details.",
-                            fg="red",
-                        )
-                    )
+                click.echo(click.style(f"❌ Error: {str(e)}", fg="red"))
 
         except KeyboardInterrupt:
             click.echo(
